@@ -1,7 +1,7 @@
 
 # This script is used to train stage 0 i.e. the autoencoder of Quest
 
-python train.py --config-name=train_autoencoder.yaml \
+python train.py --config-name=train_autoencoder_fedavg.yaml \
     task=libero_90 \
     algo=quest \
     exp_name=final \
