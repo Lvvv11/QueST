@@ -1,0 +1,11 @@
+defaults:
+  - _self_
+
+federated:
+  non_iid: false
+  n_clients: 100
+  n_shards: 10
+  frac: 0.3
+  n_client_epochs: 20
+  n_epochs: 100
+  log_every: 1
