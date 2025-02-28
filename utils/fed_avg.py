@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from fed_utils.sampler import FederatedSampler
+from utils.sampler import FederatedSampler
 from hydra.utils import instantiate
 import quest.utils.utils as utils
 from tqdm import tqdm
