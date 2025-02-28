@@ -46,7 +46,7 @@ class FederatedSampler(Sampler):
         idx_shard = [i for i in range(self.n_shards)]
         dict_users = {i: np.array([]) for i in range(self.n_clients)}
         idxs = np.arange(self.n_shards * num_imgs)
-        labels = self.dataset.task_id.numpy()
+        labels = self.dataset.task_id.numpy() # Use Task ID for labels
 
         # sort labels
         idxs_labels = np.vstack((idxs, labels))
