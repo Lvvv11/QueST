@@ -1,6 +1,7 @@
 defaults:
   - train_base
   - _self_
+  - federated_base
 
 train_dataloader:
   batch_size: 256
