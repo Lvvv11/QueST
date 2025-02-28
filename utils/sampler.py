@@ -73,3 +73,7 @@ class FederatedSampler(Sampler):
         client_idxs = list(self.dict_users[self.client_id])
         for item in client_idxs:
             yield int(item)
+    
+    def __len__(self):
+        return len(list(self.dict_users[self.client_id]))
+
