@@ -7,7 +7,7 @@ from omegaconf import OmegaConf
 from tqdm import tqdm
 from pathlib import Path
 import warnings
-
+from utils.fed_avg import FedAvg
 import torch
 import torch.nn as nn
 import quest.utils.utils as utils
