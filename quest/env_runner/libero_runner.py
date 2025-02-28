@@ -3,6 +3,7 @@ import gc
 import quest.utils.libero_utils as lu
 import quest.utils.obs_utils as ObsUtils
 import wandb
+import time
 from tqdm import tqdm
 import multiprocessing
 
@@ -43,7 +44,7 @@ class LiberoRunner():
         per_env_success_rates, per_env_rewards = {}, {}
         videos = {}
         for env_name in tqdm(env_names, disable=not do_tqdm):
-
+            print("Env Name: ", env_name)
             any_success = False
             env_succs, env_rews, env_video = [], [], []
             rollouts = self.run_policy_in_env(env_name, policy, render=n_video > 0)
@@ -58,13 +59,16 @@ class LiberoRunner():
                     if save_video_fn is not None:
                         video_hwc = np.array(episode['render'])
                         video_chw = video_hwc.transpose((0, 3, 1, 2))
-                        save_video_fn(video_chw, env_name, i)
+                        success_or_fail = "success" if success else "fail"
+                        save_video_fn(video_chw, env_name, i, success_or_fail)
                     else:
                         env_video.extend(episode['render'])
-                    
+            print(f"** rollout done : {env_name} ")
             per_env_success_rates[env_name] = np.mean(env_succs)
             per_env_rewards[env_name] = np.mean(env_rews)
             per_env_any_success.append(any_success)
+            print(f"current env(task) success rate : {per_env_success_rates[env_name]}")
+            print()
 
             if len(env_video) > 0:
                 video_hwc = np.array(env_video)
@@ -97,20 +101,31 @@ class LiberoRunner():
         all_init_states = self.benchmark.get_task_init_states(env_id)
         count = 0
         eval_loop_num = (self.rollouts_per_env+self.num_parallel_envs-1)//self.num_parallel_envs
-
+        print(f"** Eval_loop_num {eval_loop_num} of {env_name} starting")
+        print("Eval_loop_num : ", eval_loop_num)
+        avg_epi_time = []
         while count < eval_loop_num:
             indices = np.arange(count * env_num, (count + 1) * env_num) % all_init_states.shape[0]
             init_states_ = all_init_states[indices]
+            self.episode_idx = count
+            epi_start_time = time.time()
             success, total_reward, episode = self.run_episode(env, 
                                                               env_name, 
                                                               policy,
                                                               init_states_,
                                                               env_num,
                                                               render)
+            print(f"** Episode {self.episode_idx} : Success {success[0]}")
+            epi_time = time.time() - epi_start_time
+            avg_epi_time.append(epi_time)
             count += 1
+            print("Episoded Count : ", count)
             for k in range(env_num):
                 episode_k = {key: value[:,k] for key, value in episode.items()}
                 yield success[k], total_reward[k], episode_k
+                print(f"Success: {success[k]")
+        avg_epi_time = sum(avg_epi_time) / len(avg_epi_time)
+        print(f"Average Episode time : {avg_epi_time}")
         env._env.close()
         gc.collect()
         del env
