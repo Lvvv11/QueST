@@ -87,6 +87,12 @@ def main(cfg):
     print('Saving to:', experiment_dir)
     print('Experiment name:', experiment_name)
 
+    if "federated" in cfg:
+        print('- FedAvg Training...')
+        fed_avg = FedAvg(cfg, model, dataset)
+        fed_avg.train()
+        return
+
     wandb.init(
         dir=experiment_dir,
         name=experiment_name,
